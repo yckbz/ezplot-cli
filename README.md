@@ -1,4 +1,4 @@
-# ezplot
+# ezplot-cli
 
 Fast command-line plotting for research data on Linux servers. 
 
