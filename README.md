@@ -5,7 +5,7 @@ Fast command-line plotting for research data on Linux servers.
 ## Install
 
 ```bash
-python -m pip install .
+pip install ezplot-cli
 ```
 
 ## Get Help
