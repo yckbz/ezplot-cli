@@ -30,7 +30,7 @@ def _parse_pair(raw: str, option_name: str) -> tuple[float, float]:
 
 
 def _parse_figsize(raw: str) -> tuple[float, float]:
-    return _parse_pair(raw, "--figsize")
+    return _parse_positive_pair(raw, "--figsize")
 
 
 def _parse_positive_pair(raw: str, option_name: str) -> tuple[float, float]:
@@ -52,11 +52,29 @@ def _parse_positive_float(raw: str, option_name: str) -> float:
 
 def _normalize_argv(argv: list[str] | None) -> list[str]:
     raw_args = list(sys.argv[1:] if argv is None else argv)
+    raw_args = _normalize_attached_option_values(raw_args)
     if len(raw_args) == 1:
         candidate = raw_args[0]
         if candidate not in {"-h", "--help", "scatter", "line", "hist", "heatmap", "density"} and not candidate.startswith("-"):
             return ["scatter", "-xi", "0", "-yi", "1", candidate]
     return raw_args
+
+
+def _normalize_attached_option_values(raw_args: list[str]) -> list[str]:
+    attachable_options = {"--xlim", "--ylim", "--figsize", "--bin"}
+    normalized: list[str] = []
+    index = 0
+    while index < len(raw_args):
+        token = raw_args[index]
+        if token in attachable_options and index + 1 < len(raw_args):
+            value = raw_args[index + 1]
+            if value.startswith("-") and not value.startswith("--"):
+                normalized.append(f"{token}={value}")
+                index += 2
+                continue
+        normalized.append(token)
+        index += 1
+    return normalized
 
 
 def _base_parser() -> argparse.ArgumentParser:
